@@ -1,0 +1,14 @@
+# Claude Code
+CLAUDE.md
+.claude/
+
+# Environment
+.env
+
+# IDE / OS
+.idea/
+.DS_Store
+
+# Dependencies
+/vendor/
+/node_modules/
