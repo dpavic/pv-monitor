@@ -5,7 +5,7 @@ declare(strict_types=1);
 // Temporary page for step 1: checks the database connection.
 // Will be replaced by the real overview page in step 4.
 
-require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../src/bootstrap.php';
 
 try {
     $pdo     = Database::connection();
