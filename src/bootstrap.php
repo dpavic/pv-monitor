@@ -12,6 +12,25 @@ error_reporting(E_ALL);
 ini_set('display_errors', getenv('APP_ENV') === 'development' ? '1' : '0');
 
 /**
+ * Escapes a value for safe output in HTML (protection against XSS).
+ */
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * URL of a file in public/assets with its modification time appended,
+ * so the browser loads a new version as soon as the file changes.
+ */
+function asset(string $path): string
+{
+    $version = filemtime(__DIR__ . '/../public/assets/' . $path) ?: 0;
+
+    return 'assets/' . $path . '?v=' . $version;
+}
+
+/**
  * Sends data as JSON and stops the script.
  */
 function json_response(array $data, int $status = 200): never

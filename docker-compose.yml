@@ -10,6 +10,18 @@ services:
       db:
         condition: service_healthy
 
+  # Simulates the live data feed: adds new measurements as soon as a 15-minute interval is reached
+  ticker:
+    build: ./docker/php
+    volumes:
+      - .:/var/www/html
+    env_file: .env
+    command: ["sh", "-c", "while true; do php bin/tick.php; sleep 60; done"]
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: mysql:8.4
     environment:
