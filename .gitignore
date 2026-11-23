@@ -12,3 +12,7 @@ CLAUDE.md
 # Dependencies
 /vendor/
 /node_modules/
+
+
+# Internal Documentation
+/internDocs
