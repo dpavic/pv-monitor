@@ -7,9 +7,27 @@ declare(strict_types=1);
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/MeasurementRepository.php';
 
-// Show PHP errors only during development, never to real users
+// Show PHP errors only during development, never to real users.
+// Any other or missing APP_ENV counts as production (safe default).
 error_reporting(E_ALL);
 ini_set('display_errors', getenv('APP_ENV') === 'development' ? '1' : '0');
+
+// Last safety net for exceptions nobody caught: log the details,
+// show the user only a generic message
+set_exception_handler(function (Throwable $e): void {
+    error_log('Uncaught ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+        exit(1);
+    }
+
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
+    }
+    echo 'Interner Fehler. Bitte später erneut versuchen.';
+});
 
 /**
  * Escapes a value for safe output in HTML (protection against XSS).
