@@ -64,9 +64,9 @@ require __DIR__ . '/../templates/header.php';
     <div class="section__head">
         <h2 id="day-title">Tagesverlauf</h2>
 
-        <div class="day-nav">
+        <div class="date-nav">
             <button type="button" class="button" id="day-prev" aria-label="Vorheriger Tag">◀</button>
-            <input type="date" class="day-nav__input" id="day-input" aria-label="Datum"
+            <input type="date" class="date-nav__input" id="day-input" aria-label="Datum"
                    value="<?= e($selectedDay) ?>" max="<?= e($today) ?>">
             <button type="button" class="button" id="day-next" aria-label="Nächster Tag">▶</button>
             <button type="button" class="button button--light" id="day-today">Heute</button>

@@ -180,9 +180,9 @@ h1, h2, h3 {
     color: var(--muted);
 }
 
-/* ----- Day navigation ----- */
+/* ----- Date navigation (day / month / year) ----- */
 
-.day-nav {
+.date-nav {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -219,7 +219,7 @@ h1, h2, h3 {
     background: #d1eedc;
 }
 
-.day-nav__input {
+.date-nav__input {
     height: 40px;
     padding: 0 8px;
     border: 1px solid var(--border);
@@ -228,7 +228,38 @@ h1, h2, h3 {
     font: inherit;
 }
 
-/* ----- Daily totals ----- */
+.date-nav__title {
+    min-width: 140px;
+    font-size: 1.125rem;
+    text-align: center;
+}
+
+/* ----- Segmented control (Monat / Jahr) ----- */
+
+.segmented {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 10px;
+    background: var(--green-100);
+}
+
+.segmented__button {
+    height: 32px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--green-700);
+    font: inherit;
+    cursor: pointer;
+}
+
+.segmented__button[aria-pressed="true"] {
+    background: var(--green-700);
+    color: #fff;
+}
+
+/* ----- Totals ----- */
 
 .stats {
     display: grid;

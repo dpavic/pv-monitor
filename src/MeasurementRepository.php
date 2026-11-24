@@ -9,6 +9,14 @@ final class MeasurementRepository
 {
     private const COLUMNS = 'measured_at, pv_power_w, load_power_w, battery_power_w, battery_soc, grid_power_w';
 
+    // Energy totals in kWh. Each row is a 15-minute average power:
+    // W * 0.25 h / 1000 = kWh, i.e. W / 4000
+    private const ENERGY_SUMS = '
+        COALESCE(SUM(pv_power_w), 0) / 4000                  AS pv_kwh,
+        COALESCE(SUM(load_power_w), 0) / 4000                AS load_kwh,
+        COALESCE(SUM(GREATEST(grid_power_w, 0)), 0) / 4000   AS grid_import_kwh,
+        COALESCE(SUM(GREATEST(-grid_power_w, 0)), 0) / 4000  AS grid_export_kwh';
+
     private ?PDOStatement $insertStatement = null;
 
     public function __construct(private PDO $pdo)
@@ -66,22 +74,61 @@ final class MeasurementRepository
 
     /**
      * Energy totals of one day in kWh.
-     * Each row is a 15-minute average power: W * 0.25 h / 1000 = kWh, i.e. W / 4000.
      */
     public function daySummary(DateTimeImmutable $day): array
     {
         $statement = $this->pdo->prepare(
-            'SELECT COALESCE(SUM(pv_power_w), 0) / 4000                  AS pv_kwh,
-                    COALESCE(SUM(load_power_w), 0) / 4000                AS load_kwh,
-                    COALESCE(SUM(GREATEST(grid_power_w, 0)), 0) / 4000   AS grid_import_kwh,
-                    COALESCE(SUM(GREATEST(-grid_power_w, 0)), 0) / 4000  AS grid_export_kwh
+            'SELECT ' . self::ENERGY_SUMS . '
              FROM measurements
              WHERE measured_at >= :start AND measured_at < :end'
         );
         $statement->execute($this->dayRange($day));
 
-        // MySQL returns SUM() results as DECIMAL strings
-        return array_map(fn ($value) => round((float) $value, 2), $statement->fetch());
+        return $this->castTotals($statement->fetch());
+    }
+
+    /**
+     * Energy totals per day in the range [$start, $end), keyed by "YYYY-MM-DD".
+     */
+    public function dailyTotals(DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        return $this->totalsPerPeriod("DATE_FORMAT(measured_at, '%Y-%m-%d')", $start, $end);
+    }
+
+    /**
+     * Energy totals per month in the range [$start, $end), keyed by "YYYY-MM".
+     */
+    public function monthlyTotals(DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        return $this->totalsPerPeriod("DATE_FORMAT(measured_at, '%Y-%m')", $start, $end);
+    }
+
+    /**
+     * $periodSql is always one of the fixed expressions above, never user input,
+     * so it is safe to put it into the query string.
+     */
+    private function totalsPerPeriod(string $periodSql, DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT ' . $periodSql . ' AS period, ' . self::ENERGY_SUMS . '
+             FROM measurements
+             WHERE measured_at >= :start AND measured_at < :end
+             GROUP BY period
+             ORDER BY period'
+        );
+        $statement->execute([
+            'start' => $start->format('Y-m-d H:i:s'),
+            'end'   => $end->format('Y-m-d H:i:s'),
+        ]);
+
+        $totals = [];
+        foreach ($statement->fetchAll() as $row) {
+            $period          = $row['period'];
+            unset($row['period']);
+            $totals[$period] = $this->castTotals($row);
+        }
+
+        return $totals;
     }
 
     private function dayRange(DateTimeImmutable $day): array
@@ -90,6 +137,14 @@ final class MeasurementRepository
             'start' => $day->format('Y-m-d 00:00:00'),
             'end'   => $day->modify('+1 day')->format('Y-m-d 00:00:00'),
         ];
+    }
+
+    /**
+     * MySQL returns SUM() results as DECIMAL strings.
+     */
+    private function castTotals(array $row): array
+    {
+        return array_map(fn ($value) => round((float) $value, 2), $row);
     }
 
     /**

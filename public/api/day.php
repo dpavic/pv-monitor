@@ -24,25 +24,8 @@ try {
     json_response(['error' => 'Interner Fehler.'], 500);
 }
 
-/**
- * Part / total in percent, or null if the total is 0 (e.g. no sun at all).
- */
-function percent(float $part, float $total): ?float
-{
-    return $total > 0 ? round($part / $total * 100, 1) : null;
-}
-
-// Self-consumption rate: share of the PV production used in the house (incl. battery)
-$selfConsumption = percent($totals['pv_kwh'] - $totals['grid_export_kwh'], $totals['pv_kwh']);
-
-// Self-sufficiency rate: share of the consumption NOT bought from the grid
-$selfSufficiency = percent($totals['load_kwh'] - $totals['grid_import_kwh'], $totals['load_kwh']);
-
 json_response([
     'date'         => $day->format('Y-m-d'),
-    'summary'      => $totals + [
-        'self_consumption_percent' => $selfConsumption,
-        'self_sufficiency_percent' => $selfSufficiency,
-    ],
+    'summary'      => with_ratios($totals),
     'measurements' => $measurements,
 ]);

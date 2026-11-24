@@ -54,6 +54,34 @@ function require_get_request(): void
 }
 
 /**
+ * Adds self-consumption and self-sufficiency rates to energy totals (kWh).
+ */
+function with_ratios(array $totals): array
+{
+    // Self-consumption rate: share of the PV production used in the house (incl. battery)
+    $totals['self_consumption_percent'] = percent(
+        $totals['pv_kwh'] - $totals['grid_export_kwh'],
+        $totals['pv_kwh']
+    );
+
+    // Self-sufficiency rate: share of the consumption NOT bought from the grid
+    $totals['self_sufficiency_percent'] = percent(
+        $totals['load_kwh'] - $totals['grid_import_kwh'],
+        $totals['load_kwh']
+    );
+
+    return $totals;
+}
+
+/**
+ * Part / total in percent, or null if the total is 0 (e.g. no sun at all).
+ */
+function percent(float $part, float $total): ?float
+{
+    return $total > 0 ? round($part / $total * 100, 1) : null;
+}
+
+/**
  * Parses a date in the format YYYY-MM-DD. Returns null for invalid input.
  */
 function parse_date(mixed $value): ?DateTimeImmutable
