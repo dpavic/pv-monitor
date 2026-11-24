@@ -312,6 +312,96 @@ h1, h2, h3 {
     font-size: 0.875rem;
 }
 
+/* ----- Energy flow (SVG) ----- */
+
+.live-layout {
+    display: grid;
+    gap: 12px;
+}
+
+.flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.flow__svg {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+}
+
+/* Inactive line: thin and grey */
+.flow__line {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 2;
+}
+
+/* Active line: dots (dash length 0 + round caps) that move along the path */
+.flow__line.is-active {
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 0 14;
+    animation: flow-move 1.5s linear infinite; /* duration is set per line in JS */
+}
+
+.flow__line--solar.is-active   { stroke: var(--pv); }
+.flow__line--grid.is-active    { stroke: var(--grid); }
+.flow__line--battery.is-active { stroke: var(--battery); }
+
+/* Shifting the dash pattern by one full length (0 + 14) moves the dots towards the end of the path */
+@keyframes flow-move {
+    from { stroke-dashoffset: 14; }
+    to   { stroke-dashoffset: 0; }
+}
+
+.flow__node circle {
+    fill: var(--surface);
+    stroke-width: 3;
+}
+
+.flow__node--solar circle   { stroke: var(--pv); }
+.flow__node--home circle    { stroke: var(--load); }
+.flow__node--battery circle { stroke: var(--battery); }
+.flow__node--grid circle    { stroke: var(--grid); }
+
+.flow__label,
+.flow__value,
+.flow__sub {
+    text-anchor: middle;
+}
+
+.flow__label {
+    font-size: 13px;
+    fill: var(--muted);
+}
+
+.flow__value {
+    font-size: 16px;
+    font-weight: 700;
+    fill: var(--text);
+}
+
+.flow__sub {
+    font-size: 13px;
+    fill: var(--muted);
+}
+
+/* Users who turned off animations in their OS get static lines */
+@media (prefers-reduced-motion: reduce) {
+    .flow__line.is-active {
+        animation: none;
+        stroke-dasharray: none;
+        stroke-width: 4;
+    }
+}
+
 /* ----- Larger screens ----- */
 
 @media (min-width: 768px) {
@@ -325,7 +415,11 @@ h1, h2, h3 {
 }
 
 @media (min-width: 1024px) {
-    .cards,
+    /* Cards (2 x 2) on the left, energy flow on the right */
+    .live-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .stats {
         grid-template-columns: repeat(4, 1fr);
     }

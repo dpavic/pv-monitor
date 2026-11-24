@@ -31,30 +31,73 @@ require __DIR__ . '/../templates/header.php';
         <span class="muted" id="live-time">–</span>
     </div>
 
-    <div class="cards">
-        <article class="card card--pv">
-            <h3 class="card__label">Photovoltaik</h3>
-            <p class="card__value"><span id="live-pv">–</span> <small>kW</small></p>
-            <p class="card__info">Erzeugung</p>
-        </article>
+    <div class="live-layout">
+        <div class="cards">
+            <article class="card card--pv">
+                <h3 class="card__label">Photovoltaik</h3>
+                <p class="card__value"><span id="live-pv">–</span> <small>kW</small></p>
+                <p class="card__info">Erzeugung</p>
+            </article>
 
-        <article class="card card--load">
-            <h3 class="card__label">Verbrauch</h3>
-            <p class="card__value"><span id="live-load">–</span> <small>kW</small></p>
-            <p class="card__info">Hausverbrauch</p>
-        </article>
+            <article class="card card--load">
+                <h3 class="card__label">Verbrauch</h3>
+                <p class="card__value"><span id="live-load">–</span> <small>kW</small></p>
+                <p class="card__info">Hausverbrauch</p>
+            </article>
 
-        <article class="card card--battery">
-            <h3 class="card__label">Batterie</h3>
-            <p class="card__value"><span id="live-soc">–</span> <small>%</small></p>
-            <p class="card__info" id="live-battery-state">–</p>
-        </article>
+            <article class="card card--battery">
+                <h3 class="card__label">Batterie</h3>
+                <p class="card__value"><span id="live-soc">–</span> <small>%</small></p>
+                <p class="card__info" id="live-battery-state">–</p>
+            </article>
 
-        <article class="card card--grid">
-            <h3 class="card__label">Netz</h3>
-            <p class="card__value"><span id="live-grid">–</span> <small>kW</small></p>
-            <p class="card__info" id="live-grid-state">–</p>
-        </article>
+            <article class="card card--grid">
+                <h3 class="card__label">Netz</h3>
+                <p class="card__value"><span id="live-grid">–</span> <small>kW</small></p>
+                <p class="card__info" id="live-grid-state">–</p>
+            </article>
+        </div>
+
+        <!-- Energy flow: lines are animated with CSS when energy flows in that direction -->
+        <div class="flow">
+            <svg class="flow__svg" viewBox="0 0 400 330" role="img" aria-labelledby="flow-title flow-desc">
+                <title id="flow-title">Energiefluss</title>
+                <desc id="flow-desc">Aktuelle Energieflüsse werden geladen.</desc>
+
+                <!-- Lines first, so the nodes are drawn on top. Each path points in the flow direction. -->
+                <path class="flow__line flow__line--solar" data-flow="solar-home" d="M200 60 Q330 60 330 160"/>
+                <path class="flow__line flow__line--solar" data-flow="solar-grid" d="M200 60 Q70 60 70 160"/>
+                <path class="flow__line flow__line--solar" data-flow="solar-battery" d="M200 60 L200 260"/>
+                <path class="flow__line flow__line--grid" data-flow="grid-home" d="M70 160 L330 160"/>
+                <path class="flow__line flow__line--battery" data-flow="battery-home" d="M200 260 Q330 260 330 160"/>
+
+                <g class="flow__node flow__node--solar">
+                    <circle cx="200" cy="60" r="40"/>
+                    <text class="flow__label" x="200" y="54">Solar</text>
+                    <text class="flow__value" x="200" y="74" id="flow-solar">–</text>
+                </g>
+
+                <g class="flow__node flow__node--grid">
+                    <circle cx="70" cy="160" r="40"/>
+                    <text class="flow__label" x="70" y="154">Netz</text>
+                    <text class="flow__value" x="70" y="174" id="flow-grid">–</text>
+                    <text class="flow__sub" x="70" y="218" id="flow-grid-state"></text>
+                </g>
+
+                <g class="flow__node flow__node--home">
+                    <circle cx="330" cy="160" r="40"/>
+                    <text class="flow__label" x="330" y="154">Haus</text>
+                    <text class="flow__value" x="330" y="174" id="flow-home">–</text>
+                </g>
+
+                <g class="flow__node flow__node--battery">
+                    <circle cx="200" cy="260" r="40"/>
+                    <text class="flow__label" x="200" y="254">Batterie</text>
+                    <text class="flow__value" x="200" y="274" id="flow-battery">–</text>
+                    <text class="flow__sub" x="200" y="318" id="flow-battery-state"></text>
+                </g>
+            </svg>
+        </div>
     </div>
 
     <p class="alert" id="live-error" hidden>Live-Daten konnten nicht geladen werden.</p>
