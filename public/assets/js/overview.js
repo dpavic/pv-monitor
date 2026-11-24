@@ -230,7 +230,8 @@ $(function () {
                 },
                 scales: {
                     x: {
-                        ticks: { maxTicksLimit: 12 }
+                        // No rotated labels: on small screens Chart.js simply shows fewer of them
+                        ticks: { maxTicksLimit: 12, maxRotation: 0, autoSkipPadding: 12 }
                     },
                     power: {
                         position: 'left',

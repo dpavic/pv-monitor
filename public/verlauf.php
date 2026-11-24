@@ -43,7 +43,7 @@ require __DIR__ . '/../templates/header.php';
 ?>
 
 <section class="section" id="history" data-range="<?= e($range) ?>" data-date="<?= e($date) ?>">
-    <div class="section__head">
+    <div class="section__head section__head--controls">
         <div class="segmented" role="group" aria-label="Zeitraum">
             <button type="button" class="segmented__button" data-range-button="month">Monat</button>
             <button type="button" class="segmented__button" data-range-button="year">Jahr</button>

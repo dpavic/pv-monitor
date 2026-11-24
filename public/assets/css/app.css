@@ -28,7 +28,11 @@
     box-sizing: border-box;
 }
 
+/* Column layout: main grows, so the footer stays at the bottom on short pages */
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 16px;
@@ -37,9 +41,21 @@ body {
     background: var(--background);
 }
 
+main {
+    flex: 1;
+}
+
 h1, h2, h3 {
     margin: 0;
     line-height: 1.2;
+}
+
+/* Clearly visible focus for keyboard users (not shown on mouse click) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--green-500);
+    outline-offset: 2px;
 }
 
 .container {
@@ -189,8 +205,8 @@ h1, h2, h3 {
 }
 
 .button {
-    min-width: 40px;
-    height: 40px;
+    min-width: 44px; /* 44 px: recommended minimum size for touch targets */
+    height: 44px;
     padding: 0 12px;
     border: 0;
     border-radius: 8px;
@@ -220,7 +236,7 @@ h1, h2, h3 {
 }
 
 .date-nav__input {
-    height: 40px;
+    height: 44px;
     padding: 0 8px;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -244,7 +260,7 @@ h1, h2, h3 {
 }
 
 .segmented__button {
-    height: 32px;
+    height: 36px;
     padding: 0 16px;
     border: 0;
     border-radius: 8px;
@@ -257,6 +273,17 @@ h1, h2, h3 {
 .segmented__button[aria-pressed="true"] {
     background: var(--green-700);
     color: #fff;
+}
+
+/* Verlauf controls: full width on phones, one row from 768 px */
+.section__head--controls .segmented,
+.section__head--controls .date-nav {
+    width: 100%;
+}
+
+.section__head--controls .segmented__button,
+.section__head--controls .date-nav__title {
+    flex: 1;
 }
 
 /* ----- Totals ----- */
@@ -409,17 +436,27 @@ h1, h2, h3 {
         font-size: 1.75rem;
     }
 
+    /* Cards (2 x 2) on the left, energy flow on the right */
+    .live-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .section__head--controls .segmented,
+    .section__head--controls .date-nav {
+        width: auto;
+    }
+
+    .section__head--controls .segmented__button,
+    .section__head--controls .date-nav__title {
+        flex: none;
+    }
+
     .chart-box {
         height: 380px;
     }
 }
 
 @media (min-width: 1024px) {
-    /* Cards (2 x 2) on the left, energy flow on the right */
-    .live-layout {
-        grid-template-columns: 1fr 1fr;
-    }
-
     .stats {
         grid-template-columns: repeat(4, 1fr);
     }

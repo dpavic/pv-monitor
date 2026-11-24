@@ -133,7 +133,6 @@ $(function () {
         chart.series[1].setData(periods.map(p => p.load_kwh), false);
         chart.series[2].setData(periods.map(p => p.grid_export_kwh), false);
         chart.series[3].setData(periods.map(p => p.grid_import_kwh), false);
-        chart.xAxis[0].setTitle({ text: range === 'month' ? 'Tag' : 'Monat' }, false);
         chart.redraw(); // draw once after all changes
     }
 
@@ -161,8 +160,7 @@ $(function () {
             credits: { enabled: false },
             colors: ['#e8a400', '#475569', '#22a05b', '#2563eb'],
             xAxis: {
-                categories: [],
-                title: { text: 'Tag' }
+                categories: []
             },
             yAxis: {
                 min: 0,
@@ -210,11 +208,12 @@ $(function () {
             },
             responsive: {
                 rules: [{
-                    // Small screens: smaller legend, no axis title
+                    // Small screens: smaller legend, no axis title, wider columns
                     condition: { maxWidth: 500 },
                     chartOptions: {
                         legend: { itemStyle: { fontSize: '11px' } },
-                        yAxis: { title: { text: null } }
+                        yAxis: { title: { text: null } },
+                        plotOptions: { column: { groupPadding: 0.05, pointPadding: 0 } }
                     }
                 }]
             }

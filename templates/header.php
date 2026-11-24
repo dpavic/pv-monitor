@@ -14,7 +14,9 @@ $navItems = [
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f3d2a">
     <title><?= e($pageTitle) ?> – PV-Monitor</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
 <body>
