@@ -10,8 +10,7 @@ if (PHP_SAPI !== 'cli') {
     exit('CLI only');
 }
 
-require_once __DIR__ . '/../src/Database.php';
-require_once __DIR__ . '/../src/MeasurementRepository.php';
+require_once __DIR__ . '/../src/bootstrap.php';
 require_once __DIR__ . '/../src/Simulator.php';
 
 $options = getopt('', ['days:']);

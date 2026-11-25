@@ -2,10 +2,44 @@
 
 declare(strict_types=1);
 
-// Shared setup for all pages and API endpoints.
+// Shared setup for all pages, API endpoints and CLI scripts.
 
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/MeasurementRepository.php';
+
+/**
+ * Loads KEY=value lines from the .env file in the project root into the environment.
+ * Variables that already exist are not overwritten: with Docker, docker-compose sets
+ * them from .env (env_file); on a normal web server this function does the job.
+ */
+function load_env_file(string $path): void
+{
+    if (!is_readable($path)) {
+        return;
+    }
+
+    foreach (file($path, FILE_IGNORE_NEW_LINES) as $line) {
+        $line = trim($line);
+
+        // Skip empty lines, comments and lines without "="
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            continue;
+        }
+
+        [$name, $value] = array_map('trim', explode('=', $line, 2));
+
+        // Allow optional quotes: KEY="value" or KEY='value'
+        if (preg_match('/^(["\'])(.*)\1$/', $value, $matches)) {
+            $value = $matches[2];
+        }
+
+        if (getenv($name) === false) {
+            putenv("$name=$value");
+        }
+    }
+}
+
+load_env_file(__DIR__ . '/../.env');
 
 // Show PHP errors only during development, never to real users.
 // Any other or missing APP_ENV counts as production (safe default).
